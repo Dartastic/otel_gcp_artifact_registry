@@ -2,7 +2,6 @@
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
 import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
-import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_gcp_artifact_registry_suppression.dart';
 
@@ -54,54 +53,70 @@ Future<T> tracedGcpArtifactRegistry<T>({
     kind: SpanKind.client,
   );
   try {
-    span.setStringAttribute('gcp.service', 'artifactregistry');
+    span.addAttributes(OTel.attributes(
+        [OTel.attributeString('gcp.service', 'artifactregistry')]));
     final r = await invoke();
     final res = r.result;
     if (res != null) {
       if (res.project != null) {
-        span.setStringAttribute('gcp.project.id', res.project!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('gcp.project.id', res.project!)]));
       }
       if (res.location != null) {
-        span.setStringAttribute('cloud.region', res.location!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('cloud.region', res.location!)]));
       }
       if (res.repository != null) {
-        span.setStringAttribute(
-          'gcp.artifactregistry.repository',
-          res.repository!,
-        );
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString(
+            'gcp.artifactregistry.repository',
+            res.repository!,
+          )
+        ]));
       }
       if (res.packageName != null) {
-        span.setStringAttribute(
-          'gcp.artifactregistry.package',
-          res.packageName!,
-        );
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString(
+            'gcp.artifactregistry.package',
+            res.packageName!,
+          )
+        ]));
       }
       if (res.versionName != null) {
-        span.setStringAttribute(
-          'gcp.artifactregistry.version',
-          res.versionName!,
-        );
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString(
+            'gcp.artifactregistry.version',
+            res.versionName!,
+          )
+        ]));
       }
       if (res.format != null) {
-        span.setStringAttribute('gcp.artifactregistry.format', res.format!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString('gcp.artifactregistry.format', res.format!)
+        ]));
       }
       if (res.imageSize != null) {
-        span.setIntAttribute('container.image.size', res.imageSize!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeInt('container.image.size', res.imageSize!)]));
       }
       if (res.statusCode != null) {
-        span.setIntAttribute('http.response.status_code', res.statusCode!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeInt('http.response.status_code', res.statusCode!)]));
       }
       if (res.errorCode != null) {
-        span.setStringAttribute('artifactregistry.error.code', res.errorCode!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString('artifactregistry.error.code', res.errorCode!)
+        ]));
       }
-      final fail =
-          res.errorCode != null ||
+      final fail = res.errorCode != null ||
           (res.statusCode != null && res.statusCode! >= 400);
       if (fail) {
-        span.setStringAttribute(
-          ErrorResource.errorType.key,
-          res.errorCode ?? 'artifactregistry.error',
-        );
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString(
+            ErrorResource.errorType.key,
+            res.errorCode ?? 'artifactregistry.error',
+          )
+        ]));
         span.setStatus(SpanStatusCode.Error, res.errorMessage);
       }
     }
